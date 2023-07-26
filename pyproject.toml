@@ -34,8 +34,6 @@ platforms = [ "Windows", "macOS", "Linux",]
 license-key = "MIT"
 additional-files = [ "include peakviewer/icons/*.png", "include peakviewer/icons/*.ico",]
 
-[tool.importcheck]
-
 [tool.mypy]
 python_version = "3.8"
 namespace_packages = true
@@ -46,6 +44,18 @@ show_error_codes = true
 
 [tool.snippet-fmt]
 directives = [ "code-block",]
+
+[tool.importcheck]
+always = [
+    "peakviewer",
+    "peakviewer.icons",
+    "peakviewer.__main__",
+    "peakviewer.about_dialog",
+    "peakviewer.app",
+    "peakviewer.peak_canvas_panel",
+    "peakviewer.peak_viewer_frame",
+    "peakviewer.toolbar",
+]
 
 [tool.dependency-dash."requirements.txt"]
 order = 10
