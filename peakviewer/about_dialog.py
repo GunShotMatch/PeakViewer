@@ -44,15 +44,12 @@ class AboutDialog(wx.MessageDialog):
 
 	def __init__(self, parent: wx.Frame):
 
+		# this package
+		import peakviewer
+
 		message = StringList()
 
-		try:
-			our_version = importlib.metadata.version("peakviewer")
-		except:
-			# this package
-			import peakviewer
-			our_version = peakviewer.__version__
-
+		our_version = peakviewer.__version__
 		message.append(f"Version: {our_version}")
 		mpl_version = importlib.metadata.version("matplotlib")
 		message.append(f"Matplotlib: {mpl_version}")
