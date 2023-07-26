@@ -1,0 +1,5 @@
+click>=8.1.6
+domdf-python-tools>=3.6.1
+matplotlib>=3.7.2
+wxpython>=4.0.7; platform_system == "Windows"
+wxpython>=4.0.7; platform_system == "Darwin"

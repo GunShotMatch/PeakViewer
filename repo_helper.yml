@@ -25,3 +25,7 @@ python_versions:
 
 classifiers:
  - 'Development Status :: 3 - Alpha'
+
+manifest_additional:
+ - "include peakviewer/icons/*.png"
+ - "include peakviewer/icons/*.ico"

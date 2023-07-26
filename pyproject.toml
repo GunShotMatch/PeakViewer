@@ -23,12 +23,16 @@ Homepage = "https://github.com/GunShotMatch/peakviewer"
 "Issue Tracker" = "https://github.com/GunShotMatch/peakviewer/issues"
 "Source Code" = "https://github.com/GunShotMatch/peakviewer"
 
+[project.scripts]
+peakviewer = "peakviewer.__main__:main"
+
 [tool.whey]
 base-classifiers = [ "Development Status :: 3 - Alpha",]
 python-versions = [ "3.8", "3.9", "3.10", "3.11",]
 python-implementations = [ "CPython",]
 platforms = [ "Windows", "macOS", "Linux",]
 license-key = "MIT"
+additional-files = [ "include peakviewer/icons/*.png", "include peakviewer/icons/*.ico",]
 
 [tool.importcheck]
 
@@ -45,6 +49,9 @@ directives = [ "code-block",]
 
 [tool.dependency-dash."requirements.txt"]
 order = 10
+
+[tool.dep_checker.name_mapping]
+wxpython = "wx"
 
 [tool.snippet-fmt.languages.python]
 reformat = true
