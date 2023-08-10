@@ -14,6 +14,7 @@ enable_conda: false
 enable_tests: false
 enable_docs: false
 on_pypi: false
+python_deploy_version: 3.9
 
 use_whey: true
 
