@@ -86,3 +86,9 @@ To install with ``pip``:
 	$ python -m pip install git+https://github.com/GunShotMatch/peakviewer
 
 .. end installation
+
+Or without ``git``:
+
+.. code-block:: bash
+
+	$ python -m pip install pyproject-examples@https://github.com/repo-helper/pyproject-examples/archive/refs/heads/master.zip
