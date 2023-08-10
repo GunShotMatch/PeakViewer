@@ -123,6 +123,16 @@ class PeakCanvasPanel(wx.Panel):
 		self.toolbar.Realize()
 		self.do_layout()
 
+		self.no_project_stamp = self.figure.text(
+				0.5,
+				0.5,
+				"No Project Opened",
+				fontsize=32,
+				color="Black",
+				horizontalalignment="center",
+				verticalalignment="center",
+				)
+
 		self.rejected_peak_stamp = self.figure.text(
 				0.5,
 				0.5,
@@ -155,6 +165,30 @@ class PeakCanvasPanel(wx.Panel):
 		sizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
 		self.SetSizer(sizer)
 		self.Fit()
+
+	def show_rejected_stamp(self, visible: bool = True) -> None:
+		"""
+		Show or hide the "REJECTED" stamp.
+
+		:param visible:
+		"""
+
+		if visible:
+			self.rejected_peak_stamp.set_alpha(0.75)
+		else:
+			self.rejected_peak_stamp.set_alpha(0)
+
+		self.refresh()
+
+	def show_no_project_stamp(self, visible: bool = True) -> None:
+		"""
+		Show or hide the "No Project Opened" stamp.
+
+		:param visible:
+		"""
+
+		self.no_project_stamp.set_alpha(visible)
+		self.refresh()
 
 	def refresh(self) -> None:
 		"""

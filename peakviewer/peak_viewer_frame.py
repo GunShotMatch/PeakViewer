@@ -31,13 +31,14 @@ import importlib.metadata
 import importlib.resources
 import os
 import textwrap
+from traceback import format_exc
 from typing import Any, Optional
 
 # 3rd party
 import wx  # type: ignore[import]
 from domdf_python_tools.paths import PathPlus
 from domdf_python_tools.typing import PathLike
-from libgunshotmatch import gzip_util
+from libgunshotmatch.consolidate import ConsolidatedPeak
 from libgunshotmatch.project import Project
 
 # this package
@@ -45,7 +46,7 @@ from peakviewer.about_dialog import AboutDialog
 from peakviewer.peak_canvas_panel import PeakCanvasPanel
 from peakviewer.toolbar import ID_ACCEPT, ID_REJECT, ToolbarPropertiesPanel, create_toolbar
 
-__all__ = ["PeakViewerFrame", "ProjectDropTarget", "UnsupportedProject"]
+__all__ = ("PeakViewerFrame", "ProjectDropTarget", "UnsupportedProject")
 
 
 class UnsupportedProject(ValueError):
@@ -78,9 +79,9 @@ class PeakViewerFrame(wx.Frame):
 	toolbar_name_panel: wx.StaticText
 
 	def __init__(self, title: str):
-		wx.Frame.__init__(self, None, -1, title, size=(620, 620))
+		wx.Frame.__init__(self, None, -1, title, size=(720, 680))
 
-		self.SetMinSize((680, 620))
+		self.SetMinSize((950, 680))
 		self.set_icon()
 
 		self.panel = PeakCanvasPanel(self, n_repeats=5)
@@ -201,21 +202,19 @@ class PeakViewerFrame(wx.Frame):
 			self.GetMenuBar().FindItemById(wx.ID_BACKWARD).Enable(True)
 			self.GetMenuBar().FindItemById(wx.ID_FIRST).Enable(True)
 
-		peak = self.project.consolidated_peaks[self.peak_idx]
+		peak: ConsolidatedPeak = self.project.consolidated_peaks[self.peak_idx]
 		print(peak)
 
 		print(peak.rt_list)
 
-		if peak.meta.get("acceptable_shape", True):
-			self.panel.rejected_peak_stamp.set_alpha(0)
-		else:
-			self.panel.rejected_peak_stamp.set_alpha(0.75)
+		self.panel.show_rejected_stamp(not peak.meta.get("acceptable_shape", True))
 
 		self.toolbar_properties_panel.peak_number = self.peak_idx
 		self.toolbar_properties_panel.retention_time = peak.rt / 60
+		self.toolbar_properties_panel.match_factor = peak.hits[0].match_factor
 		self.toolbar_properties_panel.redraw()
 
-		self.toolbar_name_panel.SetLabelText('\n'.join(textwrap.wrap(peak.hits[0].name, width=25)))
+		self.toolbar_name_panel.SetLabelText('\n'.join(textwrap.wrap(peak.hits[0].name, width=40)))
 
 		self.panel.draw_peak(self.project, peak.meta["peak_number"])
 
@@ -248,7 +247,7 @@ class PeakViewerFrame(wx.Frame):
 			self.panel.reset(len(project.datafile_data))
 			self.peak_idx = 0
 			self.draw_peak()
-			self.toolbar_properties_panel.project_name = project.name
+			# self.toolbar_properties_panel.project_name = project.name
 			self.toolbar_properties_panel.max_peak_number = len(project.consolidated_peaks)
 			self.toolbar_properties_panel.redraw()
 
@@ -266,6 +265,8 @@ class PeakViewerFrame(wx.Frame):
 			toolbar.EnableTool(ID_ACCEPT, True)
 			toolbar.EnableTool(ID_REJECT, True)
 			toolbar.Realize()
+
+			self.panel.show_no_project_stamp(False)
 
 		except OSError:
 			wx.LogError("Cannot open file '%s'." % filename)
@@ -315,8 +316,20 @@ class PeakViewerFrame(wx.Frame):
 			pathname = fileDialog.GetPath()
 			wait = wx.BusyInfo(f"Saving {pathname}", parent=self)
 			wx.Yield()
-			gzip_util.write_gzip_json(pathname, self.project.to_dict(), indent=0)
-			del wait
+
+			log = wx.LogGui()
+			log.DisableTimestamp()
+			try:
+				raise ValueError("This is a test")
+				# gzip_util.write_gzip_json(pathname, self.project.to_dict(), indent=0)
+			except Exception as e:
+				# stdlib
+				for line in format_exc().splitlines():
+					wx.LogError(line)
+				wx.LogError("An error ocurred while saving the project.")
+			finally:
+				log.Flush()
+				del wait
 
 	def on_quit(self, event: wx.CommandEvent) -> None:
 		"""

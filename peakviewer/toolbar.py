@@ -32,7 +32,7 @@ from typing import Tuple
 # 3rd party
 import wx  # type: ignore[import]
 
-__all__ = ["ToolbarPropertiesPanel", "create_toolbar"]
+__all__ = ("ToolbarPropertiesPanel", "create_toolbar")
 
 ID_ACCEPT = wx.NewIdRef()
 ID_REJECT = wx.NewIdRef()
@@ -40,11 +40,15 @@ ID_REJECT = wx.NewIdRef()
 
 class ToolbarPropertiesPanel(wx.StaticText):
 	"""
-	Toolbar static text panel for displaying project and peak information.
+	Toolbar static text panel for displaying peak information.
 	"""
 
-	#: The name of the project.
-	project_name: str = ''
+	# """
+	# Toolbar static text panel for displaying project and peak information.
+	# """
+
+	# #: The name of the project.
+	# project_name: str = ''
 
 	#: The retention time of the currently displayed peak, in minutes.
 	retention_time: float = 0
@@ -55,8 +59,11 @@ class ToolbarPropertiesPanel(wx.StaticText):
 	#: The maximum peak number in the project.
 	max_peak_number: int = 0
 
+	#: The average match factor for the top compound across the aligned peaks.
+	match_factor: float = 0
+
 	def __init__(self, parent: wx.Frame):
-		super().__init__(parent, wx.ID_ANY, '')
+		super().__init__(parent, wx.ID_ANY, '', size=(90, -1), style=wx.ALIGN_RIGHT)
 		self.redraw()
 
 	def redraw(self) -> None:
@@ -64,7 +71,10 @@ class ToolbarPropertiesPanel(wx.StaticText):
 		Update the text with current values.
 		"""
 
-		label_text = f"{self.project_name}   \n{self.retention_time:0.3f} min   \n{self.peak_number+1}/{self.max_peak_number}   "
+		# label_text = f" {self.project_name}   \n {self.retention_time:0.3f} min   \n {self.peak_number+1}/{self.max_peak_number}   "
+		# self.SetLabelText(label_text)
+
+		label_text = f" {self.retention_time:0.3f} min   \n {self.peak_number+1}/{self.max_peak_number}   \n {self.match_factor}   "
 		self.SetLabelText(label_text)
 
 
@@ -94,7 +104,14 @@ def create_toolbar(
 	# 		)
 	# toolbar.AddSeparator()
 
-	toolbar.AddControl(wx.StaticText(toolbar, wx.ID_ANY, "  Project:   \n  Retention Time:   \n  Peak No.:   "))
+	# toolbar.AddControl(wx.StaticText(toolbar, wx.ID_ANY, "  Project:   \n  Retention Time:   \n  Peak No.:   "))
+	toolbar.AddControl(
+			wx.StaticText(
+					toolbar,
+					wx.ID_ANY,
+					"  Retention Time:   \n  Peak No.:   \n  Avg. Match Factor: ",
+					)
+			)
 	toolbar.AddSeparator()
 	toolbar_properties_panel = ToolbarPropertiesPanel(toolbar)
 	toolbar.AddControl(toolbar_properties_panel)
