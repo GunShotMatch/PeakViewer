@@ -31,6 +31,7 @@ import importlib.metadata
 import importlib.resources
 import os
 import textwrap
+import webbrowser
 from traceback import format_exc
 from typing import Any, Optional
 
@@ -47,6 +48,8 @@ from peakviewer.peak_canvas_panel import PeakCanvasPanel
 from peakviewer.toolbar import ID_ACCEPT, ID_REJECT, ToolbarPropertiesPanel, create_toolbar
 
 __all__ = ("PeakViewerFrame", "ProjectDropTarget", "UnsupportedProject")
+
+ID_WIKI = wx.NewIdRef()
 
 
 class UnsupportedProject(ValueError):
@@ -123,8 +126,8 @@ class PeakViewerFrame(wx.Frame):
 		peak_menu = wx.Menu()
 		peak_menu.Append(wx.ID_FORWARD, "&Next").Enable(False)
 		peak_menu.Append(wx.ID_BACKWARD, "&Previous").Enable(False)
-		peak_menu.Append(wx.ID_FIRST, "Go to %First").Enable(False)
-		peak_menu.Append(wx.ID_LAST, "Go to %Last").Enable(False)
+		peak_menu.Append(wx.ID_FIRST, "Go to &First").Enable(False)
+		peak_menu.Append(wx.ID_LAST, "Go to &Last").Enable(False)
 		peak_menu.AppendSeparator()
 		peak_menu.Append(ID_ACCEPT, "&Accept\tCtrl+A").Enable(False)
 		peak_menu.Append(ID_REJECT, "&Reject\tCtrl+R").Enable(False)
@@ -132,6 +135,7 @@ class PeakViewerFrame(wx.Frame):
 
 		help_menu = wx.Menu()
 		help_menu.Append(wx.ID_ABOUT, "&About")
+		help_menu.Append(ID_WIKI, "&Wiki")
 		menubar.Append(help_menu, "&Help")
 
 		self.SetMenuBar(menubar)
@@ -147,6 +151,7 @@ class PeakViewerFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.on_accept, id=ID_ACCEPT)
 		self.Bind(wx.EVT_MENU, self.on_reject, id=ID_REJECT)
 		self.Bind(wx.EVT_MENU, self.on_about, id=wx.ID_ABOUT)
+		self.Bind(wx.EVT_MENU, self.on_wiki, id=ID_WIKI)
 		self.Bind(wx.EVT_MENU, self.on_next_peak, id=wx.ID_FORWARD)
 		self.Bind(wx.EVT_MENU, self.on_previous_peak, id=wx.ID_BACKWARD)
 		self.Bind(wx.EVT_MENU, self.on_goto_first, id=wx.ID_FIRST)
@@ -436,6 +441,13 @@ class PeakViewerFrame(wx.Frame):
 
 		msg = AboutDialog(self)
 		msg.ShowModal()
+
+	def on_wiki(self, event: wx.CommandEvent) -> None:
+		"""
+		Handler for 'Wiki' menuentry.
+		"""
+
+		webbrowser.open("https://github.com/GunShotMatch/PeakViewer/wiki/")
 
 
 class ProjectDropTarget(wx.TextDropTarget):
