@@ -27,12 +27,42 @@ CLI entry point for the Peak Viewer.
 #
 
 # stdlib
+import textwrap
 from typing import Optional
 
 # 3rd party
 import click
+from consolekit.options import version_option
 
-__all__ = ["main"]
+__all__ = ("main", )
+
+
+def version_callback(ctx: click.Context, param: click.Option, value: int) -> None:
+	"""
+	Callback for the ``--version`` argument.
+	"""
+
+	# stdlib
+	import sys
+
+	# this package
+	import peakviewer
+
+	if not value or ctx.resilient_parsing:
+		return
+
+	if value > 2:
+		# this package
+		from peakviewer.versions import get_formatted_versions
+		click.echo("Peak Viewer")
+		click.echo(textwrap.indent(str(get_formatted_versions()), "  "))
+	elif value > 1:
+		python_version = sys.version.replace('\n', ' ')
+		click.echo(f"Peak Viewer version {peakviewer.__version__}, Python {python_version}")
+	else:
+		click.echo(f"Peak Viewer version {peakviewer.__version__}")
+
+	ctx.exit()
 
 
 @click.argument(
@@ -41,6 +71,7 @@ __all__ = ["main"]
 		required=False,
 		type=click.Path(file_okay=True, dir_okay=False, exists=True),
 		)
+@version_option(version_callback)
 @click.command
 def main(filename: Optional[str] = None) -> None:
 	"""

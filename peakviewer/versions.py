@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 #
-#  about_dialog.py
+#  versions.py
 """
-About dialog for the Peak Viewer.
+Tool to get software versions.
 """
 #
 #  Copyright © 2023 Dominic Davis-Foster <dominic@davis-foster.co.uk>
@@ -26,40 +26,42 @@ About dialog for the Peak Viewer.
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
+# stdlib
+import importlib.metadata
+import platform
+import sys
+
 # 3rd party
-import wx  # type: ignore[import]
+from domdf_python_tools.stringlist import StringList
+from domdf_python_tools.words import LF
 
 # this package
-from peakviewer.versions import get_formatted_versions
+import peakviewer
 
-__all__ = ("AboutDialog", )
+__all__ = ("get_formatted_versions", )
 
 
-class AboutDialog(wx.MessageDialog):
+def get_formatted_versions() -> StringList:
 	"""
-	Dialog to display the version of Peak Viewer and its key dependencies.
+	Return the versions of this software and its dependencies, one per line.
 	"""
 
-	def __init__(self, parent: wx.Frame):
+	message = StringList()
 
-		message = get_formatted_versions()
+	our_version = peakviewer.__version__
+	message.append(f"Version: {our_version}")
 
-		name = "GunShotMatch Peak Viewer"
-		super().__init__(parent, name, name, wx.OK | wx.HELP | wx.ICON_INFORMATION)
-		self.ExtendedMessage = str(message)
-		self.SetHelpLabel("Copy")
+	libgsm_version = importlib.metadata.version("libgunshotmatch")
+	message.append(f"LibGunShotMatch: {libgsm_version}")
 
-	def ShowModal(self) -> int:
-		"""
-		Override ShowModal to intercept 'Copy' button (masquerading as 'Help').
+	mpl_version = importlib.metadata.version("matplotlib")
+	message.append(f"Matplotlib: {mpl_version}")
 
-		When 'Copy' is pressed, copy the version information to the clipboard.
-		"""
+	wx_version = importlib.metadata.version("wxpython")
+	message.append(f"wxPython: {wx_version}")
 
-		ret = super().ShowModal()
-		if ret == wx.ID_HELP:
-			if wx.TheClipboard.Open():
-				wx.TheClipboard.SetData(wx.TextDataObject(self.ExtendedMessage))
-				wx.TheClipboard.Close()
+	message.append(f"Python: {sys.version.replace(LF, ' ')}")
 
-		return ret
+	message.append(' '.join(platform.system_alias(platform.system(), platform.release(), platform.version())))
+
+	return message
