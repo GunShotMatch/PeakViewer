@@ -31,6 +31,7 @@ import importlib.metadata
 import importlib.resources
 import os
 import textwrap
+import warnings
 import webbrowser
 from traceback import format_exc
 from typing import Any, Optional
@@ -39,6 +40,7 @@ from typing import Any, Optional
 import wx  # type: ignore[import]
 from domdf_python_tools.paths import PathPlus
 from domdf_python_tools.typing import PathLike
+from libgunshotmatch import gzip_util
 from libgunshotmatch.consolidate import ConsolidatedPeak
 from libgunshotmatch.project import Project
 
@@ -50,6 +52,8 @@ from peakviewer.toolbar import ID_ACCEPT, ID_REJECT, ToolbarPropertiesPanel, cre
 __all__ = ("PeakViewerFrame", "ProjectDropTarget", "UnsupportedProject")
 
 ID_WIKI = wx.NewIdRef()
+ID_LINK_AXES = wx.NewIdRef()
+ID_SAVE_VIEW = wx.NewIdRef()
 
 
 class UnsupportedProject(ValueError):
@@ -71,6 +75,9 @@ class PeakViewerFrame(wx.Frame):
 
 	#: The last directory a file was opened from.
 	last_directory: str = ''
+
+	#: The last directory an image was saved to.
+	last_image_directory: str = ''
 
 	#: The panel for displaying the peaks.
 	panel: PeakCanvasPanel
@@ -123,6 +130,11 @@ class PeakViewerFrame(wx.Frame):
 
 		menubar.Append(file_menu, "&File")
 
+		display_menu = wx.Menu()
+		display_menu.AppendCheckItem(ID_LINK_AXES, "Link &Vertical Axes").Enable(False)
+		display_menu.Append(ID_SAVE_VIEW, "&Save Current View\tCtrl+E").Enable(False)
+		menubar.Append(display_menu, "&Display")
+
 		peak_menu = wx.Menu()
 		peak_menu.Append(wx.ID_FORWARD, "&Next").Enable(False)
 		peak_menu.Append(wx.ID_BACKWARD, "&Previous").Enable(False)
@@ -152,6 +164,8 @@ class PeakViewerFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.on_reject, id=ID_REJECT)
 		self.Bind(wx.EVT_MENU, self.on_about, id=wx.ID_ABOUT)
 		self.Bind(wx.EVT_MENU, self.on_wiki, id=ID_WIKI)
+		self.Bind(wx.EVT_MENU, self.on_link_axes, id=ID_LINK_AXES)
+		self.Bind(wx.EVT_MENU, self.on_save_view, id=ID_SAVE_VIEW)
 		self.Bind(wx.EVT_MENU, self.on_next_peak, id=wx.ID_FORWARD)
 		self.Bind(wx.EVT_MENU, self.on_previous_peak, id=wx.ID_BACKWARD)
 		self.Bind(wx.EVT_MENU, self.on_goto_first, id=wx.ID_FIRST)
@@ -258,6 +272,9 @@ class PeakViewerFrame(wx.Frame):
 
 			menubar = self.GetMenuBar()
 			menubar.GetMenu(menubar.FindMenu("File")).FindItemById(wx.ID_SAVE).Enable(True)
+			display_menu = menubar.GetMenu(menubar.FindMenu("Display"))
+			display_menu.FindItemById(ID_LINK_AXES).Enable(True)
+			display_menu.FindItemById(ID_SAVE_VIEW).Enable(True)
 			peak_menu = menubar.GetMenu(menubar.FindMenu("Peak"))
 			peak_menu.FindItemById(ID_ACCEPT).Enable(True)
 			peak_menu.FindItemById(ID_REJECT).Enable(True)
@@ -297,6 +314,8 @@ class PeakViewerFrame(wx.Frame):
 
 			pathname = fileDialog.GetPath()
 			self.last_directory = os.path.split(pathname)[0]
+			if not self.last_image_directory:
+				self.last_image_directory = self.last_directory
 			self.load_project(pathname)
 
 	def on_save_project(self, event: wx.CommandEvent) -> None:
@@ -325,8 +344,7 @@ class PeakViewerFrame(wx.Frame):
 			log = wx.LogGui()
 			log.DisableTimestamp()
 			try:
-				raise ValueError("This is a test")
-				# gzip_util.write_gzip_json(pathname, self.project.to_dict(), indent=0)
+				gzip_util.write_gzip_json(pathname, self.project.to_dict(), indent=0)
 			except Exception as e:
 				# stdlib
 				for line in format_exc().splitlines():
@@ -448,6 +466,78 @@ class PeakViewerFrame(wx.Frame):
 		"""
 
 		webbrowser.open("https://github.com/GunShotMatch/PeakViewer/wiki/")
+
+	def on_link_axes(self, event: wx.CommandEvent) -> None:
+		"""
+		Handler for 'Link Vertical Axes' menuentry.
+		"""
+
+		self.panel.link_vertical_axes = bool(event.GetSelection())
+		self.panel.rescale_y_axis(event)
+
+	def on_save_view(self, event: wx.CommandEvent) -> None:
+		"""
+		Handler for 'Save Current View' menuentry.
+		"""
+
+		if self.project is None:
+			raise ValueError("No project loaded")
+
+		# Fetch the required filename and file type.
+		filetypes, exts, filter_index = self.panel.canvas._get_imagesave_wildcards()
+		retention_time = f"{self.toolbar_properties_panel.retention_time:0.3f}min"
+		peak_no = self.toolbar_properties_panel.peak_number + 1
+		default_filename = f"{self.project.name}-{retention_time}-peak{peak_no}".replace('.', '_')
+		default_filetype = self.panel.canvas.get_default_filetype()
+		dialog = wx.FileDialog(
+				self,
+				"Save Current View",
+				self.last_image_directory,
+				f"{default_filename}.{default_filetype}",
+				filetypes,
+				style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+				)
+		dialog.SetFilterIndex(filter_index)
+		if dialog.ShowModal() == wx.ID_OK:
+			path = PathPlus(dialog.GetPath())
+			print(f"Saving current view to {path.as_posix()!r}")
+			fmt = exts[dialog.GetFilterIndex()]
+			ext = path.suffix[1:]
+			if ext in self.panel.canvas.get_supported_filetypes() and fmt != ext:
+				# looks like they forgot to set the image type drop
+				# down, going with the extension.
+				warnings.warn(
+						f"extension {ext!r} did not match the selected image type {fmt!r}; going with {ext!r}"
+						)
+				fmt = ext
+			# Save dir for next time, unless empty str (which means use cwd).
+			self.last_image_directory = str(path.parent)
+			try:
+				self.panel.figure.savefig(path, format=fmt)
+			except Exception as e:
+				dialog = wx.MessageDialog(
+						parent=self.panel.canvas.GetParent(), message=str(e), caption="Matplotlib error"
+						)
+				dialog.ShowModal()
+				dialog.Destroy()
+
+		# with wx.FileDialog(
+		# 		self,
+		# 		"Save Current View",
+		# 		# t png, pdf, ps, eps and svg.
+		# 		wildcard="Portable Network GraphicsGunShotMatch Project files (*.gsmp)|*.gsmp",
+		# 		style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+		# 		defaultDir=self.last_directory,
+		# 		defaultFile=f"{self.project.name}.gsmp"
+		# 		) as fileDialog:
+		# 	if fileDialog.ShowModal() == wx.ID_CANCEL:
+		# 		return
+
+		# 	pathname = fileDialog.GetPath()
+		# 	wait = wx.BusyInfo(f"Saving {pathname}", parent=self)
+		# 	wx.Yield()
+
+		# self.panel.figure.savefig()
 
 
 class ProjectDropTarget(wx.TextDropTarget):

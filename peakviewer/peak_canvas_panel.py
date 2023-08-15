@@ -174,6 +174,9 @@ class PeakCanvasPanel(wx.Panel):
 
 	axes: List[Axes]
 
+	# If True all y axes have the same scale, otherwise they scale to the largest value in each
+	link_vertical_axes = False
+
 	def __init__(self, parent: wx.Frame, *, n_repeats: int):
 		wx.Panel.__init__(self, parent)
 
@@ -221,7 +224,8 @@ class PeakCanvasPanel(wx.Panel):
 		# otherwise there'll be an infinite loop.
 		should_redraw = False
 
-		# ax: Axes
+		maxima = []
+
 		for ax in self.axes:
 			for artist in ax.lines:
 				assert isinstance(artist, Line2D)
@@ -230,13 +234,27 @@ class PeakCanvasPanel(wx.Panel):
 				try:
 					high = calculate_new_limit(x, y, ax.get_xlim())
 				except Exception:
+					maxima.append(ax.get_ylim()[1])
 					continue
 
 				newhigh = high if high > 0 else 0
 				current_ylim = ax.get_ylim()[1]
 				new_ylim = newhigh * 1.2  # Add a little space above the line
 				# print(new_ylim, current_ylim)
+				maxima.append(new_ylim)
 
+		if self.link_vertical_axes:
+			if maxima:
+				new_ylim = max(maxima)
+				for ax in self.axes:
+					current_ylim = ax.get_ylim()[1]
+					if new_ylim != current_ylim:
+						ax.set_ylim(0, new_ylim)
+						should_redraw = True
+		else:
+			# ax: Axes
+			for new_ylim, ax in zip(maxima, self.axes):
+				current_ylim = ax.get_ylim()[1]
 				if new_ylim != current_ylim:
 					ax.set_ylim(0, new_ylim)
 					should_redraw = True
