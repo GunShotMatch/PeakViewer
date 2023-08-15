@@ -116,9 +116,6 @@ class PeakCanvasToolbar(NavigationToolbar2WxAgg):
 			("Pan", "Pan along x axis, Right button zooms", "move", "pan"),
 			("Zoom", "Zoom along x axis", "zoom_to_rect", "zoom"),
 			("Subplots", "Configure subplots", "subplots", "configure_subplots"),
-			# (None, None, None, None),
-			# ('Save', 'Save the figure', 'filesave', 'save_figure'),
-			# TODO: override to temporarily add peak info to title
 			)
 
 	def drag_zoom(self, event: Event) -> None:
@@ -335,7 +332,7 @@ class PeakCanvasPanel(wx.Panel):
 		min_rt = sys.maxsize
 		max_rt = 0
 		for repeat_idx, (name, repeat) in enumerate(project.datafile_data.items()):
-			assert repeat.qualified_peaks is not None  # TODO: validate when opening
+			assert repeat.qualified_peaks is not None
 			peak = repeat.qualified_peaks[peak_idx]
 			print(name, peak)
 
@@ -345,7 +342,7 @@ class PeakCanvasPanel(wx.Panel):
 		for repeat_idx, (name, repeat) in enumerate(project.datafile_data.items()):
 			assert repeat.qualified_peaks is not None
 			peak = repeat.qualified_peaks[peak_idx]
-			assert repeat.datafile.intensity_matrix is not None  # TODO: validate when opening
+			assert repeat.datafile.intensity_matrix is not None
 			im = repeat.datafile.intensity_matrix
 			tic = im.tic
 
