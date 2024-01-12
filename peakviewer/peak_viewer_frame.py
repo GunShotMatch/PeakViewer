@@ -43,6 +43,7 @@ from domdf_python_tools.typing import PathLike
 from libgunshotmatch import gzip_util
 from libgunshotmatch.consolidate import ConsolidatedPeak
 from libgunshotmatch.project import Project
+from libgunshotmatch_mpl.peakviewer import UnsupportedProject, load_project
 
 # this package
 from peakviewer.about_dialog import AboutDialog
@@ -54,12 +55,6 @@ __all__ = ("PeakViewerFrame", "ProjectDropTarget", "UnsupportedProject")
 ID_WIKI = wx.NewIdRef()
 ID_LINK_AXES = wx.NewIdRef()
 ID_SAVE_VIEW = wx.NewIdRef()
-
-
-class UnsupportedProject(ValueError):
-	"""
-	Exception raised when a project is missing certain attributes (such as the consolidated peak list).
-	"""
 
 
 class PeakViewerFrame(wx.Frame):
@@ -249,17 +244,7 @@ class PeakViewerFrame(wx.Frame):
 
 		try:
 
-			project = Project.from_file(filename)
-
-			# Validation of loaded datafile
-			if project.consolidated_peaks is None:
-				raise UnsupportedProject("Project.consolidated_peaks is unset")
-
-			for (name, repeat) in project.datafile_data.items():
-				if repeat.qualified_peaks is None:
-					raise UnsupportedProject(f"Repeat.qualified_peaks is unset for {name!r}")
-				if repeat.datafile.intensity_matrix is None:
-					raise UnsupportedProject(f"Datafile.intensity_matrix is unset for {name!r}")
+			project = load_project(filename)
 
 			self.project = project
 			self.SetTitle(f"Peak Viewer – {project.name}")

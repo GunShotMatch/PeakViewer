@@ -34,13 +34,13 @@ wxPython panel for displaying peaks using matplotlib.
 
 # stdlib
 import math
-import sys
 from typing import TYPE_CHECKING, List, Optional, Tuple
 
 # 3rd party
 import matplotlib
 import wx  # type: ignore[import]
 from libgunshotmatch.project import Project
+from libgunshotmatch_mpl.peakviewer import draw_peaks
 from matplotlib.axes import Axes
 from matplotlib.backend_bases import Event, MouseButton
 from matplotlib.figure import Figure
@@ -329,57 +329,8 @@ class PeakCanvasPanel(wx.Panel):
 		for ax in self.axes:
 			ax.clear()
 
-		min_rt = sys.maxsize
-		max_rt = 0
-		for repeat_idx, (name, repeat) in enumerate(project.datafile_data.items()):
-			assert repeat.qualified_peaks is not None
-			peak = repeat.qualified_peaks[peak_idx]
-			print(name, peak)
+		draw_peaks(project, peak_idx, self.figure, self.axes)
 
-			min_rt = min(min_rt, peak.rt - 20)
-			max_rt = max(max_rt, peak.rt + 20)
-
-		for repeat_idx, (name, repeat) in enumerate(project.datafile_data.items()):
-			assert repeat.qualified_peaks is not None
-			peak = repeat.qualified_peaks[peak_idx]
-			assert repeat.datafile.intensity_matrix is not None
-			im = repeat.datafile.intensity_matrix
-			tic = im.tic
-
-			# Get subset of timelist within RT range
-			time_list = []
-			intensity_list = []
-			for rt, intensity in zip(tic.time_list, tic.intensity_array):
-				if min_rt <= rt <= max_rt:
-					time_list.append(rt / 60)
-					intensity_list.append(intensity)
-
-			self.axes[repeat_idx].plot(time_list, intensity_list)
-			# self.axes[repeat_idx].vlines([peak.rt], 0, peak.area, colors="red")
-			self.axes[repeat_idx].vlines(
-					[peak.rt / 60],
-					0,
-					intensity_list[time_list.index(peak.rt / 60)],
-					colors="red",
-					)
-			self.axes[repeat_idx].text(
-					peak.rt / 60,
-					self.axes[repeat_idx].get_ylim()[1] * 0.2,
-					f" {peak.rt/60:0.3f}",
-					)
-		self.figure.supylabel("Intensity")
-		self.axes[0].autoscale()
-		self.axes[-1].set_xlabel("Retention Time (mins)")
-		for ax, repeat_name in zip(self.axes, project.datafile_data):
-			ax.ticklabel_format(axis='y', scilimits=(0, 0), useMathText=True)
-			ax.set_ylim(bottom=0)
-			# xmin, xmax = ax.get_xlim()
-			# ax.text(xmin + (xmax-xmin)*0.05, ax.get_ylim()[1] *0.8, repeat_name)
-			ax.annotate(repeat_name, (0.01, 0.8), xycoords="axes fraction")
-		self.axes[0].set_xlim(min_rt / 60, max_rt / 60)
-		# self.figure.subplots_adjust(bottom=0, top=1, left=0, right=1, hspace=0, wspace=0)
-		# self.figure.subplots_adjust(top=0.95, right=0.95)
-		self.figure.subplots_adjust(bottom=0.1, left=0.1, top=0.95, right=0.98, hspace=0.3)
 		self.refresh()
 
 		# self.Layout()
