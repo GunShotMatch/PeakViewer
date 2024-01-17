@@ -341,7 +341,7 @@ class PeakCanvasPanel(wx.Panel):
 
 _superscript_translate_map = {ord(str(num)): sup for num, sup in enumerate("⁰¹²³⁴⁵⁶⁷⁸⁹")}
 _superscript_translate_map[ord('-')] = '⁻'
-print(_superscript_translate_map)
+# print(_superscript_translate_map)
 
 
 def _format_scientific(value: float) -> str:
