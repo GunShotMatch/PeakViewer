@@ -177,7 +177,7 @@ class PeakCanvasPanel(wx.Panel):
 	def __init__(self, parent: wx.Frame, *, n_repeats: int):
 		wx.Panel.__init__(self, parent)
 
-		self.figure = Figure()
+		self.figure = Figure(layout="constrained")
 		self.axes: List[Axes] = []
 		self.reset(n_repeats)
 
