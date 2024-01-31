@@ -252,6 +252,7 @@ class PeakViewerFrame(wx.Frame):
 			self.peak_idx = 0
 			self.draw_peak()
 			# self.toolbar_properties_panel.project_name = project.name
+			assert project.consolidated_peaks is not None
 			self.toolbar_properties_panel.max_peak_number = len(project.consolidated_peaks)
 			self.toolbar_properties_panel.redraw()
 
