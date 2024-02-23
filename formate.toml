@@ -40,4 +40,4 @@ known_third_party = [
     "matplotlib",
     "wxpython",
 ]
-known_first_party = "peakviewer"
+known_first_party = [ "peakviewer",]
