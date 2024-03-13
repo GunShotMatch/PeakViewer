@@ -31,5 +31,13 @@ lines_between_types = 0
 use_parentheses = true
 remove_redundant_aliases = true
 default_section = "THIRDPARTY"
-known_third_party = [ "click", "consolekit", "domdf_python_tools", "libgunshotmatch", "matplotlib", "wxpython",]
-known_first_party = "peakviewer"
+known_third_party = [
+    "click",
+    "consolekit",
+    "domdf_python_tools",
+    "libgunshotmatch",
+    "libgunshotmatch_mpl",
+    "matplotlib",
+    "wxpython",
+]
+known_first_party = [ "peakviewer",]
