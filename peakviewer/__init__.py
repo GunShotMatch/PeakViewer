@@ -31,3 +31,8 @@ __copyright__: str = "2023 Dominic Davis-Foster"
 __license__: str = "MIT License"
 __version__: str = "0.0.0"
 __email__: str = "dominic@davis-foster.co.uk"
+
+# 3rd party
+import matplotlib
+
+matplotlib.use("WXAgg")
