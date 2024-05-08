@@ -74,7 +74,7 @@ class ToolbarPropertiesPanel(wx.StaticText):
 		# label_text = f" {self.project_name}   \n {self.retention_time:0.3f} min   \n {self.peak_number+1}/{self.max_peak_number}   "
 		# self.SetLabelText(label_text)
 
-		label_text = f" {self.retention_time:0.3f} min   \n {self.peak_number+1}/{self.max_peak_number}   \n {self.match_factor}   "
+		label_text = f" {self.retention_time:0.3f} min   \n {self.peak_number+1}/{self.max_peak_number}   \n {self.match_factor:0.1f}   "
 		self.SetLabelText(label_text)
 
 
