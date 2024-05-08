@@ -27,6 +27,9 @@ python_versions:
 classifiers:
  - 'Development Status :: 3 - Alpha'
 
+console_scripts:
+ - peakviewer = peakviewer.__main__:main
+
 manifest_additional:
  - "include peakviewer/icons/*.png"
  - "include peakviewer/icons/*.ico"
