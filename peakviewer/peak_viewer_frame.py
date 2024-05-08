@@ -230,7 +230,7 @@ class PeakViewerFrame(wx.Frame):
 
 		self.toolbar_name_panel.SetLabelText('\n'.join(textwrap.wrap(peak.hits[0].name, width=40)))
 
-		self.panel.draw_peak(self.project, peak.meta["peak_number"])
+		self.panel.draw_peak(self.project, peak.rt_list)
 
 	def load_project(self, filename: PathLike) -> None:
 		"""

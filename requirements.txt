@@ -2,7 +2,7 @@ click>=8.1.6
 consolekit>=1.5.1
 domdf-python-tools>=3.6.1
 libgunshotmatch>=0.1.0
-libgunshotmatch-mpl@ git+https://github.com/GunShotMatch/libgunshotmatch-mpl
+libgunshotmatch-mpl>=0.6.0b1
 matplotlib>=3.7.2
 wxpython>=4.0.7; platform_system == "Windows"
 wxpython>=4.0.7; platform_system == "Darwin"

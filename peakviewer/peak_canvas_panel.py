@@ -318,7 +318,7 @@ class PeakCanvasPanel(wx.Panel):
 
 		self.canvas.draw()
 
-	def draw_peak(self, project: Project, peak_idx: int) -> None:
+	def draw_peak(self, project: Project, retention_times: List[float]) -> None:
 		"""
 		Draw a set of aligned peaks.
 
@@ -329,7 +329,7 @@ class PeakCanvasPanel(wx.Panel):
 		for ax in self.axes:
 			ax.clear()
 
-		draw_peaks(project, peak_idx, self.figure, self.axes)
+		draw_peaks(project, retention_times, self.figure, self.axes)
 
 		self.refresh()
 
