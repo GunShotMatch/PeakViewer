@@ -55,6 +55,7 @@ __all__ = ("PeakViewerFrame", "ProjectDropTarget", "UnsupportedProject")
 ID_WIKI = wx.NewIdRef()
 ID_LINK_AXES = wx.NewIdRef()
 ID_SAVE_VIEW = wx.NewIdRef()
+ID_GOTO = wx.NewIdRef()
 
 
 class PeakViewerFrame(wx.Frame):
@@ -135,6 +136,7 @@ class PeakViewerFrame(wx.Frame):
 		peak_menu.Append(wx.ID_BACKWARD, "&Previous").Enable(False)
 		peak_menu.Append(wx.ID_FIRST, "Go to &First").Enable(False)
 		peak_menu.Append(wx.ID_LAST, "Go to &Last").Enable(False)
+		peak_menu.Append(ID_GOTO, "&Go to").Enable(False)
 		peak_menu.AppendSeparator()
 		peak_menu.Append(ID_ACCEPT, "&Accept\tCtrl+A").Enable(False)
 		peak_menu.Append(ID_REJECT, "&Reject\tCtrl+R").Enable(False)
@@ -165,6 +167,7 @@ class PeakViewerFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.on_previous_peak, id=wx.ID_BACKWARD)
 		self.Bind(wx.EVT_MENU, self.on_goto_first, id=wx.ID_FIRST)
 		self.Bind(wx.EVT_MENU, self.on_goto_last, id=wx.ID_LAST)
+		self.Bind(wx.EVT_MENU, self.on_goto, id=ID_GOTO)
 
 		self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
 
@@ -184,6 +187,16 @@ class PeakViewerFrame(wx.Frame):
 		else:
 			event.Skip()
 
+	def _max_peak_idx(self) -> int:
+
+		if self.project is None:
+			raise ValueError("No project loaded")
+
+		if self.project.consolidated_peaks is None:
+			raise ValueError("Project.consolidated_peaks is unset")
+
+		return len(self.project.consolidated_peaks) - 1
+
 	def draw_peak(self) -> None:
 		"""
 		Draw a set of aligned peaks.
@@ -198,7 +211,7 @@ class PeakViewerFrame(wx.Frame):
 		# for ax in self.panel.axes:
 		# 	ax.clear()
 
-		if self.peak_idx == len(self.project.consolidated_peaks) - 1:
+		if self.peak_idx == self._max_peak_idx():
 			self.GetToolBar().EnableTool(wx.ID_FORWARD, False)
 			self.GetMenuBar().FindItemById(wx.ID_FORWARD).Enable(False)
 			self.GetMenuBar().FindItemById(wx.ID_LAST).Enable(False)
@@ -253,7 +266,7 @@ class PeakViewerFrame(wx.Frame):
 			self.draw_peak()
 			# self.toolbar_properties_panel.project_name = project.name
 			assert project.consolidated_peaks is not None
-			self.toolbar_properties_panel.max_peak_number = len(project.consolidated_peaks)
+			self.toolbar_properties_panel.max_peak_number = self._max_peak_idx() + 1
 			self.toolbar_properties_panel.redraw()
 
 			menubar = self.GetMenuBar()
@@ -264,6 +277,7 @@ class PeakViewerFrame(wx.Frame):
 			peak_menu = menubar.GetMenu(menubar.FindMenu("Peak"))
 			peak_menu.FindItemById(ID_ACCEPT).Enable(True)
 			peak_menu.FindItemById(ID_REJECT).Enable(True)
+			peak_menu.FindItemById(ID_GOTO).Enable(True)
 			peak_menu.FindItemById(wx.ID_FORWARD).Enable(True)
 			peak_menu.FindItemById(wx.ID_LAST).Enable(True)
 
@@ -395,7 +409,7 @@ class PeakViewerFrame(wx.Frame):
 		if self.project.consolidated_peaks is None:
 			raise ValueError("Project.consolidated_peaks is unset")
 
-		if self.peak_idx == len(self.project.consolidated_peaks) - 1:
+		if self.peak_idx == self._max_peak_idx():
 			return
 
 		self.peak_idx += 1
@@ -416,13 +430,21 @@ class PeakViewerFrame(wx.Frame):
 		self.peak_idx -= 1
 		self.draw_peak()
 
+	def _goto(self, new_peak_idx: int) -> None:
+		"""
+		Helper for ``on_goto_first``, ``on_goto_last`` and ``on_goto``.
+		"""
+
+		if self.peak_idx != new_peak_idx:
+			self.peak_idx = new_peak_idx
+			self.draw_peak()
+
 	def on_goto_first(self, event: wx.CommandEvent) -> None:
 		"""
 		Handler for 'Go to First Peak' menuentry.
 		"""
 
-		self.peak_idx = 0
-		self.draw_peak()
+		self._goto(0)
 
 	def on_goto_last(self, event: wx.CommandEvent) -> None:
 		"""
@@ -435,8 +457,22 @@ class PeakViewerFrame(wx.Frame):
 		if self.project.consolidated_peaks is None:
 			raise ValueError("Project.consolidated_peaks is unset")
 
-		self.peak_idx = len(self.project.consolidated_peaks) - 1
-		self.draw_peak()
+		self._goto(self._max_peak_idx())
+
+	def on_goto(self, event: wx.CommandEvent) -> None:
+		"""
+		Handler for 'Go to Last Peak' menuentry.
+		"""
+
+		new_peak_idx = wx.GetNumberFromUser(
+				"Enter Peak Number",
+				'',
+				"Go To Peak",
+				self.peak_idx + 1,
+				1,
+				self._max_peak_idx() + 1,
+				)
+		self._goto(new_peak_idx - 1)
 
 	def on_about(self, event: wx.CommandEvent) -> None:
 		"""
