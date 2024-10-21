@@ -38,7 +38,18 @@ tox_unmanaged:
  - testenv
 
 github_ci_requirements:
-  Linux:
-    pre:
-      - "sudo apt update"
-      - "sudo apt install libgtk-3-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev"
+ Linux:
+  pre:
+   - "sudo apt update"
+   - "sudo apt install libgtk-3-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev"
+   - "sudo add-apt-repository universe"
+   - "sudo apt update"
+   - "sudo apt install libhdf5-dev netcdf-bin libnetcdf-dev"
+ Windows:
+  post:
+   # Prefery binary wheels for older versions over sdists for newer ones
+   - pip config set global.prefer-binary true
+ macOS:
+  post:
+   # Prefery binary wheels for older versions over sdists for newer ones
+   - pip config set global.prefer-binary true

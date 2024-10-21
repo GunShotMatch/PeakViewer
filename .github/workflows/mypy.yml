@@ -47,6 +47,9 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libgtk-3-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev
+          sudo add-apt-repository universe
+          sudo apt update
+          sudo apt install libhdf5-dev netcdf-bin libnetcdf-dev
           python -VV
           python -m site
           python -m pip install --upgrade pip setuptools wheel
@@ -59,6 +62,7 @@ jobs:
           python -m site
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install --upgrade tox~=3.0 virtualenv!=20.16.0
+          pip config set global.prefer-binary true
 
       - name: "Run mypy"
         if: steps.changes.outputs.code == 'true'
