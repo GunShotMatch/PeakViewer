@@ -269,7 +269,7 @@ class PeakCanvasPanel(wx.Panel):
 		for ax in self.axes:
 			ax.remove()
 
-		self.axes = self.figure.subplots(  # type: ignore[assignment]
+		self.axes = self.figure.subplots(
 			n_repeats,
 			1,
 			sharex=True,
