@@ -38,7 +38,7 @@ from typing import TYPE_CHECKING, List, Optional, Tuple
 
 # 3rd party
 import matplotlib
-import wx  # type: ignore[import]
+import wx  # type: ignore[import-not-found]
 from libgunshotmatch.project import Project
 from libgunshotmatch_mpl.peakviewer import draw_peaks
 from matplotlib.axes import Axes
@@ -270,11 +270,11 @@ class PeakCanvasPanel(wx.Panel):
 			ax.remove()
 
 		self.axes = self.figure.subplots(
-			n_repeats,
-			1,
-			sharex=True,
-			subplot_kw=dict(projection="XPanAxes"),
-			)
+				n_repeats,
+				1,
+				sharex=True,
+				subplot_kw=dict(projection="XPanAxes"),
+				)
 
 	def do_layout(self) -> None:
 		"""
