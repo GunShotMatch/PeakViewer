@@ -30,7 +30,7 @@ wxPython app for the Peak Viewer.
 from typing import Optional
 
 # 3rd party
-import wx  # type: ignore[import-not-found]
+import wx  # type: ignore[import-untyped]
 
 # this package
 from peakviewer.peak_viewer_frame import PeakViewerFrame

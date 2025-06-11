@@ -38,7 +38,7 @@ from typing import TYPE_CHECKING, List, Optional, Tuple
 
 # 3rd party
 import matplotlib
-import wx  # type: ignore[import-not-found]
+import wx  # type: ignore[import-untyped]
 from libgunshotmatch.project import Project
 from libgunshotmatch_mpl.peakviewer import draw_peaks
 from matplotlib.axes import Axes

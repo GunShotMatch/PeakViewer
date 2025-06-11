@@ -37,7 +37,7 @@ from traceback import format_exc
 from typing import Any, Optional
 
 # 3rd party
-import wx  # type: ignore[import-not-found]
+import wx  # type: ignore[import-untyped]
 from domdf_python_tools.paths import PathPlus
 from domdf_python_tools.typing import PathLike
 from libgunshotmatch import gzip_util
