@@ -30,7 +30,7 @@ Main toolbar for the Peak Viewer.
 from typing import Tuple
 
 # 3rd party
-import wx  # type: ignore[import-not-found]
+import wx  # type: ignore[import-untyped]
 
 __all__ = ("ToolbarPropertiesPanel", "create_toolbar")
 

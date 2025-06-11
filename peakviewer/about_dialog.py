@@ -27,7 +27,7 @@ About dialog for the Peak Viewer.
 #
 
 # 3rd party
-import wx  # type: ignore[import-not-found]
+import wx  # type: ignore[import-untyped]
 
 # this package
 from peakviewer.versions import get_formatted_versions
