@@ -38,9 +38,11 @@ from peakviewer.peak_viewer_frame import PeakViewerFrame
 __all__ = ["PeakViewerApp"]
 
 
-class PeakViewerApp(wx.App):
+class PeakViewerApp(wx.App):  # noqa: PRM002
 	"""
 	GunShotMatch Peak Viewer application.
+
+	:param filename: Project file to display.
 	"""
 
 	def __init__(self, filename: Optional[str], *args, **kwargs):

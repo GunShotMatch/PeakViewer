@@ -38,7 +38,7 @@ ID_ACCEPT = wx.NewIdRef()
 ID_REJECT = wx.NewIdRef()
 
 
-class ToolbarPropertiesPanel(wx.StaticText):
+class ToolbarPropertiesPanel(wx.StaticText):  # noqa: PRM002
 	"""
 	Toolbar static text panel for displaying peak information.
 	"""
@@ -84,6 +84,9 @@ def create_toolbar(
 		) -> Tuple[wx.ToolBar, ToolbarPropertiesPanel, wx.StaticText]:
 	"""
 	Create the main toolbar.
+
+	:param parent: The parent widget.
+	:param icon_size: The width and height of the icons (the icons are square)
 	"""
 
 	toolbar = wx.ToolBar(
@@ -110,7 +113,7 @@ def create_toolbar(
 					toolbar,
 					wx.ID_ANY,
 					"  Retention Time:   \n  Peak No.:   \n  Avg. Match Factor: ",
-					)
+					),
 			)
 	toolbar.AddSeparator()
 	toolbar_properties_panel = ToolbarPropertiesPanel(toolbar)

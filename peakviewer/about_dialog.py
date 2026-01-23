@@ -35,7 +35,7 @@ from peakviewer.versions import get_formatted_versions
 __all__ = ("AboutDialog", )
 
 
-class AboutDialog(wx.MessageDialog):
+class AboutDialog(wx.MessageDialog):  # noqa: PRM002
 	"""
 	Dialog to display the version of Peak Viewer and its key dependencies.
 	"""

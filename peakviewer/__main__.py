@@ -37,7 +37,7 @@ from consolekit.options import version_option
 __all__ = ("main", )
 
 
-def version_callback(ctx: click.Context, param: click.Option, value: int) -> None:
+def version_callback(ctx: click.Context, param: click.Option, value: int) -> None:  # noqa: PRM002
 	"""
 	Callback for the ``--version`` argument.
 	"""

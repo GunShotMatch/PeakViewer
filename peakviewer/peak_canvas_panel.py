@@ -84,6 +84,8 @@ class XPanAxes(Axes):
 	def format_ydata(self, y: float) -> str:
 		"""
 		Format a y-axis value in scientific notation.
+
+		:param y:
 		"""
 
 		return _format_scientific(y)
@@ -91,6 +93,9 @@ class XPanAxes(Axes):
 	def format_coord(self, x: float, y: float) -> str:
 		"""
 		Format the x and y coordinates.
+
+		:param x:
+		:param y:
 		"""
 
 		formatted_x = "???" if x is None else self.format_xdata(x)
@@ -118,7 +123,7 @@ class PeakCanvasToolbar(NavigationToolbar2WxAgg):
 			("Subplots", "Configure subplots", "subplots", "configure_subplots"),
 			)
 
-	def drag_zoom(self, event: Event) -> None:
+	def drag_zoom(self, event: Event) -> None:  # noqa: PRM002
 		"""
 		Handler for the zoom action.
 
@@ -167,6 +172,9 @@ def calculate_new_limit(fixed: "numpy.ndarray", dependent: "numpy.ndarray", limi
 class PeakCanvasPanel(wx.Panel):
 	"""
 	Panel to display peaks with matplotlib.
+
+	:param parent: The parent widget.
+	:param n_repeats: The number of repeat analyses to show.
 	"""
 
 	axes: List[Axes]
@@ -208,11 +216,11 @@ class PeakCanvasPanel(wx.Panel):
 				color="red",
 				horizontalalignment="center",
 				verticalalignment="center",
-				alpha=0.75
+				alpha=0.75,
 				)
 		self.rejected_peak_stamp.set_alpha(0)
 
-	def rescale_y_axis(self, event: Event) -> None:
+	def rescale_y_axis(self, event: Event) -> None:  # noqa: PRM002
 		"""
 		Rescale the y-axis in response to a change in the x axis limits (pan or zoom).
 		"""
@@ -323,7 +331,7 @@ class PeakCanvasPanel(wx.Panel):
 		Draw a set of aligned peaks.
 
 		:param project:
-		:param peak_idx: The index of the peak (in `consolidated_peaks`) to display.
+		:param retention_times: List of retention times for the peaks.
 		"""
 
 		for ax in self.axes:

@@ -58,7 +58,7 @@ ID_SAVE_VIEW = wx.NewIdRef()
 ID_GOTO = wx.NewIdRef()
 
 
-class PeakViewerFrame(wx.Frame):
+class PeakViewerFrame(wx.Frame):  # noqa: PRM002
 	"""
 	Main frame for Peak Viewer. Contains the toolbar, menubar and peak canvas panel.
 	"""
@@ -171,7 +171,7 @@ class PeakViewerFrame(wx.Frame):
 
 		self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
 
-	def on_keypress(self, event: wx.KeyEvent) -> None:
+	def on_keypress(self, event: wx.KeyEvent) -> None:  # noqa: PRM002
 		"""
 		Handle a keypress and respond to the left and right arrow keys.
 		"""
@@ -297,7 +297,7 @@ class PeakViewerFrame(wx.Frame):
 		finally:
 			del wait
 
-	def on_open_project(self, event: wx.CommandEvent) -> None:
+	def on_open_project(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Open Project' and menuentry.
 		"""
@@ -306,7 +306,7 @@ class PeakViewerFrame(wx.Frame):
 				self,
 				"Open Project file",
 				wildcard="GunShotMatch Project files (*.gsmp)|*.gsmp",
-				style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
+				style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
 				) as fileDialog:
 
 			if fileDialog.ShowModal() == wx.ID_CANCEL:
@@ -318,7 +318,7 @@ class PeakViewerFrame(wx.Frame):
 				self.last_image_directory = self.last_directory
 			self.load_project(pathname)
 
-	def on_save_project(self, event: wx.CommandEvent) -> None:
+	def on_save_project(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for the "Save" button.
 		"""
@@ -332,7 +332,7 @@ class PeakViewerFrame(wx.Frame):
 				wildcard="GunShotMatch Project files (*.gsmp)|*.gsmp",
 				style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
 				defaultDir=self.last_directory,
-				defaultFile=f"{self.project.name}.gsmp"
+				defaultFile=f"{self.project.name}.gsmp",
 				) as fileDialog:
 			if fileDialog.ShowModal() == wx.ID_CANCEL:
 				return
@@ -354,14 +354,14 @@ class PeakViewerFrame(wx.Frame):
 				log.Flush()
 				del wait
 
-	def on_quit(self, event: wx.CommandEvent) -> None:
+	def on_quit(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Quit' button and menuentry.
 		"""
 
 		self.Close()
 
-	def on_accept(self, event: wx.CommandEvent) -> None:
+	def on_accept(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Accept Peak' button and menuentry.
 		"""
@@ -381,7 +381,7 @@ class PeakViewerFrame(wx.Frame):
 
 		self._advance()
 
-	def on_reject(self, event: wx.CommandEvent) -> None:
+	def on_reject(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Reject Peak' button and menuentry.
 		"""
@@ -415,14 +415,14 @@ class PeakViewerFrame(wx.Frame):
 		self.peak_idx += 1
 		self.draw_peak()
 
-	def on_next_peak(self, event: wx.CommandEvent) -> None:
+	def on_next_peak(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Next Peak' button and menuentry.
 		"""
 
 		self._advance()
 
-	def on_previous_peak(self, event: wx.CommandEvent) -> None:
+	def on_previous_peak(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Previous Peak' button and menuentry.
 		"""
@@ -430,7 +430,7 @@ class PeakViewerFrame(wx.Frame):
 		self.peak_idx -= 1
 		self.draw_peak()
 
-	def _goto(self, new_peak_idx: int) -> None:
+	def _goto(self, new_peak_idx: int) -> None:  # noqa: PRM002
 		"""
 		Helper for ``on_goto_first``, ``on_goto_last`` and ``on_goto``.
 		"""
@@ -439,14 +439,14 @@ class PeakViewerFrame(wx.Frame):
 			self.peak_idx = new_peak_idx
 			self.draw_peak()
 
-	def on_goto_first(self, event: wx.CommandEvent) -> None:
+	def on_goto_first(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Go to First Peak' menuentry.
 		"""
 
 		self._goto(0)
 
-	def on_goto_last(self, event: wx.CommandEvent) -> None:
+	def on_goto_last(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Go to Last Peak' menuentry.
 		"""
@@ -459,7 +459,7 @@ class PeakViewerFrame(wx.Frame):
 
 		self._goto(self._max_peak_idx())
 
-	def on_goto(self, event: wx.CommandEvent) -> None:
+	def on_goto(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Go to Last Peak' menuentry.
 		"""
@@ -474,7 +474,7 @@ class PeakViewerFrame(wx.Frame):
 				)
 		self._goto(new_peak_idx - 1)
 
-	def on_about(self, event: wx.CommandEvent) -> None:
+	def on_about(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'About' menuentry.
 		"""
@@ -482,14 +482,14 @@ class PeakViewerFrame(wx.Frame):
 		msg = AboutDialog(self)
 		msg.ShowModal()
 
-	def on_wiki(self, event: wx.CommandEvent) -> None:
+	def on_wiki(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Wiki' menuentry.
 		"""
 
 		webbrowser.open("https://github.com/GunShotMatch/PeakViewer/wiki/")
 
-	def on_link_axes(self, event: wx.CommandEvent) -> None:
+	def on_link_axes(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Link Vertical Axes' menuentry.
 		"""
@@ -497,7 +497,7 @@ class PeakViewerFrame(wx.Frame):
 		self.panel.link_vertical_axes = bool(event.GetSelection())
 		self.panel.rescale_y_axis(event)
 
-	def on_save_view(self, event: wx.CommandEvent) -> None:
+	def on_save_view(self, event: wx.CommandEvent) -> None:  # noqa: PRM002
 		"""
 		Handler for 'Save Current View' menuentry.
 		"""
@@ -529,7 +529,7 @@ class PeakViewerFrame(wx.Frame):
 				# looks like they forgot to set the image type drop
 				# down, going with the extension.
 				warnings.warn(
-						f"extension {ext!r} did not match the selected image type {fmt!r}; going with {ext!r}"
+						f"extension {ext!r} did not match the selected image type {fmt!r}; going with {ext!r}",
 						)
 				fmt = ext
 			# Save dir for next time, unless empty str (which means use cwd).
@@ -538,7 +538,9 @@ class PeakViewerFrame(wx.Frame):
 				self.panel.figure.savefig(path, format=fmt)
 			except Exception as e:
 				dialog = wx.MessageDialog(
-						parent=self.panel.canvas.GetParent(), message=str(e), caption="Matplotlib error"
+						parent=self.panel.canvas.GetParent(),
+						message=str(e),
+						caption="Matplotlib error",
 						)
 				dialog.ShowModal()
 				dialog.Destroy()
@@ -562,7 +564,7 @@ class PeakViewerFrame(wx.Frame):
 		# self.panel.figure.savefig()
 
 
-class ProjectDropTarget(wx.TextDropTarget):
+class ProjectDropTarget(wx.TextDropTarget):  # noqa: PRM002
 	"""
 	Drop target for the chart panel to accept a dragged project file.
 	"""
