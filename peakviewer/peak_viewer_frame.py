@@ -232,7 +232,7 @@ class PeakViewerFrame(wx.Frame):  # noqa: PRM002
 		peak: ConsolidatedPeak = self.project.consolidated_peaks[self.peak_idx]
 		print(peak)
 
-		print(peak.rt_list)
+		print([p / 60 for p in peak.rt_list])
 
 		self.panel.show_rejected_stamp(not peak.meta.get("acceptable_shape", True))
 
